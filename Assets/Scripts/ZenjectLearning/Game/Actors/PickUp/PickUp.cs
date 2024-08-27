@@ -24,7 +24,8 @@ namespace ZenjectLearning.Game
         private readonly ConfiguratorContext Context;
         
         private DateTime SpawnTime;
-        private bool IsActive;
+        private float StayDuration;
+        private State _State = State.InActive;
 
         /// <summary>
         /// 
@@ -48,7 +49,7 @@ namespace ZenjectLearning.Game
         /// </summary>
         public void Collect( )
         {
-            if( ! IsActive ) return;
+            if( _State != State.Active ) return;
             
             Context.CommandManager.InvokeCommand( new PickUpCollectCommand( ) );
             Destroy( );   
@@ -59,11 +60,11 @@ namespace ZenjectLearning.Game
         /// </summary>
         private void Destroy( )
         {
-            if( ! IsActive ) return;
+            if( _State != State.Active ) return;
             
            _Pool.Despawn( this );
             OnDeSpawnEvent.Invoke( this );
-            IsActive = false;
+           _State = State.InActive;
         }
 
         /// <summary>
@@ -71,8 +72,8 @@ namespace ZenjectLearning.Game
         /// </summary>
         public void Update( DateTime currTime )
         {
-            if( ! IsActive ) return;
-            if( ( currTime - SpawnTime ).TotalSeconds > 15f )
+            if( _State != State.Active ) return;
+            if( ( currTime - SpawnTime ).TotalSeconds > StayDuration )
             {
                 PunchDisappear( );
             }
@@ -83,7 +84,8 @@ namespace ZenjectLearning.Game
         /// </summary>
         private void PunchDisappear( )
         {
-            Transform.DOScale( 3f, 0.15f )
+           _State = State.Disappear;
+            Transform.DOScale( 1.5f, 0.15f )
                      .SetEase( Ease.InSine )
                      .OnComplete( ( ) =>
                      {
@@ -99,6 +101,9 @@ namespace ZenjectLearning.Game
         /// <param name="config"></param>
         public void Configure( PickUpConfig config )
         {
+            Transform.gameObject.name = $"PickUp_{config.ID}";
+            //Debug.Log( $"Spawned pickup : {ID}" );
+            
             Transform.position = config.Position;
             Transform.rotation = Quaternion.identity;
             Transform.localScale = DefaultScale;
@@ -108,8 +113,9 @@ namespace ZenjectLearning.Game
             RB.velocity = Vector3.zero;
             RB.angularVelocity = Vector3.zero;
             
+            StayDuration = config.StayDuration;
             SpawnTime = DateTime.Now;
-            IsActive = true;
+           _State = State.Active;
         }
         
         /// <summary>
@@ -118,6 +124,11 @@ namespace ZenjectLearning.Game
         public class Pool : ConfigurableTransformItemPool< PickUpConfig, PickUp >
         {
             
+        }
+        
+        private enum State
+        {
+            Active, Disappear, InActive
         }
     }
 }

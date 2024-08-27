@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
 using Zenject;
 using ZenjectLearning.Game.Utilities;
 
@@ -11,7 +12,10 @@ namespace ZenjectLearning.Game.Scenes
         private readonly PickUpSpawnArea SpawnArea;
         
         private DateTime LastPickUpSpawnTime;
-        private List< PickUp > PickUps = new ( );
+        private readonly List< PickUp > PickUps = new ( );
+        
+        private const float PickUpStayDuration = 15f;
+        private int NPickUps;
         
         /// <summary>
         /// 
@@ -30,11 +34,18 @@ namespace ZenjectLearning.Game.Scenes
         public void Tick( )
         {
             var currTime = DateTime.Now;
-            if( ( currTime - LastPickUpSpawnTime ).TotalSeconds > 0.2f )
+            if( ( currTime - LastPickUpSpawnTime ).TotalSeconds > 0.1f )
             {
-                var pickUp = PickUpPool.Spawn( new PickUpConfig( ColorTable.GetRandomColor( ), SpawnArea.RandomSpawnPoint( ) ) );
-                pickUp.OnDeSpawnEvent.AddListener( OnPickUpDeSpawn );
-                PickUps.Add( pickUp );
+                for( int i = 0; i < 3; i++ )
+                {
+                    var pickUp = PickUpPool.Spawn( new PickUpConfig( ++NPickUps,
+                                                                        ColorTable.GetRandomColor( ), 
+                                                                      SpawnArea.RandomSpawnPoint( ), 
+                                                                            PickUpStayDuration ) );
+                    pickUp.OnDeSpawnEvent.AddListener( OnPickUpDeSpawn );
+                    PickUps.Add( pickUp );
+                }
+                
                 LastPickUpSpawnTime = currTime;
             }
             
