@@ -34,7 +34,7 @@ namespace ZenjectLearning.Game.Scenes
             BindPlayer( );
             //Pick up pool.
             Container.BindMemoryPool< PickUp, PickUp.Pool >( )
-                     .WithInitialSize( 1000 )
+                     .WithInitialSize( 100 )
                      .FromSubContainerResolve( )
                      .ByNewPrefabInstaller< PickUpInstaller >( PickUpPrefab )
                      .UnderTransformGroup( "PickUps" );

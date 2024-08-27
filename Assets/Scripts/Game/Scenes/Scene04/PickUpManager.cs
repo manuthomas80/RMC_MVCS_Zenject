@@ -36,10 +36,11 @@ namespace ZenjectLearning.Game.Scenes
             var currTime = DateTime.Now;
             if( ( currTime - LastPickUpSpawnTime ).TotalSeconds > 0.1f )
             {
-                for( int i = 0; i < 3; i++ )
+                const int nItemsInBatch = 3;
+                for( int i = 0; i < nItemsInBatch; i++ )
                 {
                     var pickUp = PickUpPool.Spawn( new PickUpConfig( ++NPickUps,
-                                                                        ColorTable.GetRandomColor( ), 
+                                                                            ColorTable.GetRandomColor( ), 
                                                                       SpawnArea.RandomSpawnPoint( ), 
                                                                             PickUpStayDuration ) );
                     pickUp.OnDeSpawnEvent.AddListener( OnPickUpDeSpawn );

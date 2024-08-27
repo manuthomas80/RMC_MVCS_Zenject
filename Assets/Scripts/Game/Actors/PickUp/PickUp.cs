@@ -60,7 +60,7 @@ namespace ZenjectLearning.Game
         /// </summary>
         private void Destroy( )
         {
-            if( _State != State.Active ) return;
+            if( _State == State.InActive ) return;
             
            _Pool.Despawn( this );
             OnDeSpawnEvent.Invoke( this );
